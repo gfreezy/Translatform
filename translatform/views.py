@@ -1,34 +1,78 @@
-from pyramid.response import Response
-from pyramid.view import view_config
+from pyramid.view import (
+    view_config,
+    view_defaults,
+    )
+from pyramid.httpexceptions import HTTPNotFound
 
-from sqlalchemy.exc import DBAPIError
-
-from .models import (
-    DBSession,
-    MyModel,
+from .models.init import DBSession
+from .models.chapter import Chapter
+from .models.paragraph import (
+    Paragraph,
+    ParagraphTranslation,
+    ParagraphComment,
     )
 
-@view_config(route_name='home', renderer='templates/mytemplate.pt')
-def my_view(request):
-    try:
-        one = DBSession.query(MyModel).filter(MyModel.name=='one').first()
-    except DBAPIError:
-        return Response(conn_err_msg, content_type='text/plain', status_int=500)
-    return {'one':one, 'project':'translatform'}
 
-conn_err_msg = """\
-Pyramid is having a problem using your SQL database.  The problem
-might be caused by one of the following things:
+@view_config(route_name='toc', renderer='templates/toc.mako')
+def toc(request):
+    return dict(chapters=Chapter.all())
 
-1.  You may need to run the "initialize_translatform_db" script
-    to initialize your database tables.  Check your virtual 
-    environment's "bin" directory for this script and try to run it.
 
-2.  Your database server may not be running.  Check that the
-    database server referred to by the "sqlalchemy.url" setting in
-    your "development.ini" file is running.
+@view_config(route_name='chapter', renderer='templates/chapter.mako')
+def chapter(request):
+    chap_id = request.matchdict.get('chap_id')
+    chapter = DBSession.query(Chapter).get(chap_id)
+    if not chapter:
+        raise HTTPNotFound('chapter %s not found' % chap_id)
+    return dict(
+        chap_id=chap_id,
+        paragraphs=chapter.paragraphs)
 
-After you fix the problem, please restart the Pyramid application to
-try it again.
-"""
 
+class TranslationBase(object):
+    def __init__(self, request):
+        self.request = request
+        self.chap_id = request.matchdict.get('chap_id')
+        self.para_id = request.matchdict.get('para_id')
+        self.para = DBSession.query(Paragraph).filter_by(
+            chap_id=self.chap_id, para_number=self.para_id).first()
+
+
+@view_defaults(route_name='translation')
+class Translation(TranslationBase):
+    @view_config(request_method='GET',
+                 renderer='json')
+    def get(self):
+        return dict(
+            english=self.para.english,
+            translation=self.para.latest_translation())
+
+    @view_config(request_method='POST',
+                 renderer='json')
+    def post(self):
+        translation = self.request.params.get('translation')
+        if not translation:
+            return dict(status='error',
+                        msg='no translation')
+        self.para.add_translation(translation)
+        return dict(status='ok')
+
+
+class AllTranslation(TranslationBase):
+    @view_config(route_name='translation_history',
+                 renderer='json')
+    def get(self):
+        return dict(translations=self.para.all_translations())
+
+
+@view_config(route_name='comment',
+             request_method='POST')
+def new_comment(request):
+    pass
+
+
+@view_config(route_name='all_comment',
+             request_method='GET',
+             renderer='json')
+def all_comment(request):
+    pass
