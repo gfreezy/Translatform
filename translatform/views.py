@@ -33,7 +33,6 @@ class TranslationBase(object):
         self.request = request
         self.chap_id = request.matchdict.get('chapter')
         self.para_id = request.matchdict.get('para_id')
-        print self.chap_id, self.para_id
         self.para = DBSession.query(Paragraph).filter_by(
             chap_id=self.chap_id, identity=self.para_id).first()
         if not self.para:

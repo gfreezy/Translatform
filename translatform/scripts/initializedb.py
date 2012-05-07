@@ -77,6 +77,7 @@ def get_paragraphs(fullname):
             if 'msgid' in line:
                 msgtype, msg = line.split(' ', 1)
                 msg = msg.strip('" \n')
+                msg = msg.replace(r'\"', '"')
                 yield msg
 
 

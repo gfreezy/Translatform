@@ -4,10 +4,12 @@ import hashlib
 import re
 
 def clean_format(rst):
-    txt = re.sub(r':.*?:`(.*?)`', r'\1', rst)
+    txt = re.sub(r':.*?:`~(?:[a-zA-Z]+[.])+(.*?)`', r'\1', rst)
+    txt = re.sub(r':.*?:`(.*?)`', r'\1', txt)
     txt = re.sub(r'`(.*?)`_', r'\1', txt)
     txt = re.sub(r'`(.*?)`', r'\1', txt)
-    txt = txt.replace(r'\"', '"')
+    txt = re.sub(r'[*]{1,2}(.*?)[*]{1,2}', r'\1', txt)
+    txt = re.sub(r'[`]{1,2}(.*?)[`]{1,2}', r'\1', txt)
     txt = txt.replace(r'::', ':')
     return txt
 

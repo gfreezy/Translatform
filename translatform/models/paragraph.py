@@ -2,6 +2,7 @@
 #coding: utf8
 import datetime
 import hashlib
+import transaction
 from sqlalchemy import (
     Column,
     Integer,
@@ -40,10 +41,11 @@ class Paragraph(Base):
         return translations[-1].translation if translations else ''
 
     def add_translation(self, translation):
-        t = ParagraphTranslation(author='system',
-                                 translation=translation,
-                                 para_id=self.id)
-        DBSession.add(t)
+        with transaction.manager:
+            t = ParagraphTranslation(author='system',
+                                     translation=translation,
+                                     para_id=self.id)
+            DBSession.add(t)
 
     def all_translations(self):
         translations = DBSession.query(ParagraphTranslation).filter_by(para_id=self.id).order_by('id desc').all()

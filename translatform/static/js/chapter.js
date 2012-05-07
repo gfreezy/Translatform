@@ -18,7 +18,13 @@ function clean_space(txt) {
 
 function tidy_text(txt) {
   txt = txt.replace(/’/g, "'");
+  txt = txt.replace(/‘/g, "'");
+  txt = txt.replace(/”/g, "\"");
+  txt = txt.replace(/“/g, "\"");
+  txt = txt.replace(/，/g, ",");
+  txt = txt.replace(/。/g, ".");
   txt = txt.replace(/¶/g, "");
+  txt = txt.replace(/\(\)/g, "");
   txt = clean_space(txt);
   return txt;
 }
@@ -46,15 +52,20 @@ var $translate = $("a[href='#translate']");
 $modal.modal({show:false});
 
 $(".content").on("click", "p, li, dt, h1, h2, h3", function() {
-  var $prev = $modal.data("source");
-  if($prev) {
-    $prev.removeClass("highlight");
+  var $source = $modal.data("source");
+  if($source) {
+    $source.removeClass("highlight");
   }
-  $(this).toggleClass("highlight");
-  $modal.data("source", $(this));
+  $source = $(this);
+  $source.toggleClass("highlight");
+  $modal.data("source", $source);
 
+  var url = $source.data("url");
+  if(!url) {
+    var url = getURL($(this));
+    $source.data("url", url);
+  }
   $trans = $modal.find("textarea.translation")
-  var url = getURL($(this));
   $.getJSON(url, function(data) {
     $trans.val(Encoder.htmlDecode(data['translation']));
     $modal.find("textarea.origin").val(convertToVisibleSpace(data['english']));
@@ -71,10 +82,10 @@ $(".content").on("click", "p, li, dt, h1, h2, h3", function() {
 
 $modal.on("click", "a.btn-primary", function() {
   var $source = $modal.data("source");
+  var url = $source.data("url");
   var text = $modal.find("textarea.translation").val();
   text = convertFromVisibleSpace(text);
   $source.html(text);
-  var url = $source.attr("href");
   $.post(url, {"translation": text}, function() {
     $modal.modal("hide");
   });
@@ -82,7 +93,8 @@ $modal.on("click", "a.btn-primary", function() {
 });
 
 $history.on("show", function(e) {
-  var url = $modal.data("source").attr("href");
+  var $source = $modal.data("source");
+  var url = $source.data("url");
   $ol = $("#history ol");
   $ol.empty();
   $.getJSON(url+"history/", function(data) {
