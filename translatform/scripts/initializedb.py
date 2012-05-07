@@ -2,6 +2,9 @@
 import os
 import sys
 import transaction
+import glob
+import simplejson
+import codecs
 
 from sqlalchemy import engine_from_config
 
@@ -20,6 +23,9 @@ from ..models.paragraph import (
     ParagraphTranslation,
     ParagraphComment,
     )
+from ..utils.rst import clean_format
+
+PATH = '/home/gfreezy/src/werkzeug/docs/'
 
 
 def usage(argv):
@@ -27,6 +33,52 @@ def usage(argv):
     print('usage: %s <config_uri>\n'
           '(example: "%s development.ini")' % (cmd, cmd))
     sys.exit(1)
+
+
+def insert_chapters():
+    path = os.path.join(PATH, 'json')
+    pattern = os.path.join(path, '*.fjson')
+    for p in glob.glob(pattern):
+        with codecs.open(p, encoding='utf8') as f:
+            j = simplejson.loads(f.read())
+            if not j.get('body'):
+                continue
+            chap = Chapter(
+                title=j.get('title'),
+                body=j.get('body'),
+                toc=j.get('toc'),
+                display_toc=j.get('display_toc'),
+                current_page_name=j.get('current_page_name'),
+                parents=simplejson.dumps(j.get('parents')),
+                prev=simplejson.dumps(j.get('prev')),
+                next=simplejson.dumps(j.get('next')),
+                sourcename=j.get('sourcename'),
+                )
+            DBSession.add(chap)
+    transaction.commit()
+
+
+def insert_paragraphs(chapter):
+    path = os.path.join(PATH, 'po')
+    filename = '.'.join((os.path.splitext(chapter.sourcename)[0], 'pot'))
+    fullname = os.path.join(path, filename)
+    for para_txt in get_paragraphs(fullname):
+        para = Paragraph(para_txt)
+        chapter.paragraphs.append(para)
+
+    DBSession.merge(chapter)
+
+
+def get_paragraphs(fullname):
+    if not os.path.exists(fullname):
+        return
+    with codecs.open(fullname, encoding='utf8') as f:
+        for line in f:
+            if 'msgid' in line:
+                msgtype, msg = line.split(' ', 1)
+                msg = msg.strip('" \n')
+                yield msg
+
 
 def main(argv=sys.argv):
     if len(argv) != 2:
@@ -36,109 +88,11 @@ def main(argv=sys.argv):
     settings = get_appsettings(config_uri)
     engine = engine_from_config(settings, 'sqlalchemy.')
     DBSession.configure(bind=engine)
+    Base.metadata.drop_all(engine)
     Base.metadata.create_all(engine)
-    with transaction.manager:
-        chapter1 = Chapter(
-            title='title 1',
-            paragraphs=[
-                Paragraph(
-                    english='paragraph1',
-                    para_number=1,
-                    translations=[
-                        ParagraphTranslation(
-                            author='author1',
-                            translation=u'段落1'
-                            ),
-                        ParagraphTranslation(
-                            author='author1',
-                            translation=u'段落1.'
-                            ),
-                        ParagraphTranslation(
-                            author='author2',
-                            translation=u'段落1..'
-                            ),
-                        ],
-                    comments=[
-                        ParagraphComment(
-                            author='author3',
-                            comment='comment1'
-                            ),
-                        ParagraphComment(
-                            author='author1',
-                            comment='comment2'
-                            ),
-                        ParagraphComment(
-                            author='author3',
-                            comment='comment3'
-                            ),
-                        ]),
-                Paragraph(
-                    english='paragraph2',
-                    para_number=2,
-                    translations=[
-                        ParagraphTranslation(
-                            author='author1',
-                            translation=u'段落1'
-                            ),
-                        ParagraphTranslation(
-                            author='author1',
-                            translation=u'段落1.'
-                            ),
-                        ParagraphTranslation(
-                            author='author2',
-                            translation=u'段落1..'
-                            ),
-                        ],
-                    comments=[
-                        ParagraphComment(
-                            author='author3',
-                            comment='comment1'
-                            ),
-                        ParagraphComment(
-                            author='author1',
-                            comment='comment2'
-                            ),
-                        ParagraphComment(
-                            author='author3',
-                            comment='comment3'
-                            ),
-                        ]),
-                ])
 
-        chapter2 = Chapter(
-            title='title 2',
-            paragraphs=[
-                Paragraph(
-                    english='paragraph1',
-                    para_number=1,
-                    translations=[
-                        ParagraphTranslation(
-                            author='author1',
-                            translation=u'段落1'
-                            ),
-                        ParagraphTranslation(
-                            author='author1',
-                            translation=u'段落1.'
-                            ),
-                        ParagraphTranslation(
-                            author='author2',
-                            translation=u'段落1..'
-                            ),
-                        ],
-                    comments=[
-                        ParagraphComment(
-                            author='author3',
-                            comment='comment1'
-                            ),
-                        ParagraphComment(
-                            author='author1',
-                            comment='comment2'
-                            ),
-                        ParagraphComment(
-                            author='author3',
-                            comment='comment3'
-                            ),
-                        ])
-                ])
-        DBSession.add(chapter1)
-        DBSession.add(chapter2)
+    insert_chapters()
+
+    with transaction.manager:
+        for chapter in DBSession.query(Chapter).all():
+            insert_paragraphs(chapter)

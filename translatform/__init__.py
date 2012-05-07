@@ -11,15 +11,15 @@ def main(global_config, **settings):
     config = Configurator(settings=settings)
     config.add_static_view('static', 'static', cache_max_age=3600)
     config.add_route('toc', '/')
-    config.add_route('chapter', '/chapter{chap_id}/')
+    config.add_route('chapter', '/{chapter}/')
     config.add_route('translation',
-                     '/chapter{chap_id}/{para_id}/translation/')
+                     '/{chapter}/{para_id}/translation/')
     config.add_route('translation_history',
-                     '/chapter{chap_id}/{para_id}/translation/history/')
+                     '/{chapter}/{para_id}/translation/history/')
     config.add_route('comment',
-                     '/chapter{chap_id}/{para_id}/comment/')
+                     '/{chapter}/{para_id}/comment/')
     config.add_route('all_comment',
-                     '/chapter{chap_id}/{para_id}/comment/all/')
+                     '/{chapter}/{para_id}/comment/all/')
 
     config.scan()
     return config.make_wsgi_app()

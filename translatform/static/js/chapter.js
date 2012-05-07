@@ -1,15 +1,43 @@
 Encoder.EncodeType = "numerical";
 function convertToVisibleSpace(si) {
-  s = Encoder.htmlDecode(si);
-  so = s.replace(/ /g, "␣");
+  var s = Encoder.htmlDecode(si);
+  var so = s.replace(/ /g, "␣");
   return so;
 }
 
 function convertFromVisibleSpace(si) {
-  s = Encoder.htmlDecode(si);
-  so = s.replace(/␣/g, " ");
+  var s = Encoder.htmlDecode(si);
+  var so = s.replace(/␣/g, " ");
   return so;
 }
+
+function clean_space(txt) {
+  txt = txt.replace(/\s/g,'');
+  return txt;
+}
+
+function tidy_text(txt) {
+  txt = txt.replace(/’/g, "'");
+  txt = txt.replace(/¶/g, "");
+  txt = clean_space(txt);
+  return txt;
+}
+
+function htmlToText(html) {
+   var tmp = document.createElement("DIV");
+   tmp.innerHTML = html;
+   return tmp.textContent||tmp.innerText;
+}
+
+function getURL($target) {
+  var txt = tidy_text(htmlToText($target.html()));
+  console.info(txt);
+  var md5 = hex_md5(txt);
+  var chap_id = $("input[name='chap_id']").val();
+  return "/"+chap_id+"/"+md5+"/translation/";
+}
+
+
 
 var $modal = $("#myModal");
 var $history = $("a[href='#history']");
@@ -17,7 +45,7 @@ var $translate = $("a[href='#translate']");
 
 $modal.modal({show:false});
 
-$("div.content~ul").on("click", "a", function() {
+$(".content").on("click", "p, li, dt, h1, h2, h3", function() {
   var $prev = $modal.data("source");
   if($prev) {
     $prev.removeClass("highlight");
@@ -26,7 +54,7 @@ $("div.content~ul").on("click", "a", function() {
   $modal.data("source", $(this));
 
   $trans = $modal.find("textarea.translation")
-  var url = $(this).attr("href");
+  var url = getURL($(this));
   $.getJSON(url, function(data) {
     $trans.val(Encoder.htmlDecode(data['translation']));
     $modal.find("textarea.origin").val(convertToVisibleSpace(data['english']));
@@ -85,4 +113,8 @@ watchTextareaChange($("textarea.translation"), function($t) {
   var after = convertToVisibleSpace(before);
   $t.val(after);
   $t.caret(pos);
+});
+
+
+$(".content").on("click", "h1, h2, h3, p, li", function() {
 });

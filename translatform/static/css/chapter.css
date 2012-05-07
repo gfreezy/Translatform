@@ -28,5 +28,6 @@ form {
     background-color: blue;
 }
 .content {
-    height: 50px;
+    margin-top: 50px;
+    text-align: left;
 }

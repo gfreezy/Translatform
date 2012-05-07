@@ -2,19 +2,24 @@
 <html>
 <head>
   <link rel="stylesheet" href="/static/css/bootstrap.min.css" />
-  <link rel="stylesheet" href="/static/css/document.css" />
+  <link rel="stylesheet" href="/static/css/chapter.css" />
+  <link rel="stylesheet" href="/static/css/sphinx/pygments.css" />
+  <link rel="stylesheet" href="/static/css/sphinx/style.css" />
   <script src="/static/js/LAB.min.js"></script>
   <script>
     $LAB
     .setGlobalDefaults({Debug:true})
     .script(["/static/js/encoder.js",
-    "/static/js/jquery.min.js"]).wait()
+    "/static/js/jquery.min.js",
+    "/static/js/md5-min.js"])
+    .wait()
     .script(["/static/js/bootstrap.min.js",
-    "/static/js/jquery.caret.js"]).wait()
+    "/static/js/jquery.caret.js"])
+    .wait()
     .script("/static/js/chapter.js");
   </script>
   <title>
-    Chapter${chap_id} - Translatform
+    ${content.title |n}
   </title>
 </head>
 <body>
@@ -33,19 +38,22 @@
               <a href="#">Read</a>
             </li>
           </ul>
+          <ul class="nav pull-right">
+            <li>
+              <a href="${request.route_url('toc')}">Content</a>
+            </li>
+            <li>
+              <a href="#">Index</a>
+            </li>
+          </ul>
         </div>
       </div>
     </div>
+
     <div class="content">
+      ${content.body |n}
     </div>
 
-    <ul class="unstyled">
-      %for paragraph in paragraphs:
-      <li>
-        <pre><a href="${request.route_url('translation', chap_id=chap_id, para_id=paragraph.para_number)}">${paragraph.latest_translation()}</a></pre>
-      </li>
-      %endfor
-    </ul>
     <div id="myModal" class="modal hide">
       <div class="modal-header">
         <div class="close" data-dismiss="modal">x</div>
@@ -66,6 +74,7 @@
               <textarea class="span8 origin" disabled></textarea>
               <label>Translation</label>
               <textarea class="span8 translation"></textarea>
+              <input type="hidden" name="chap_id" value="${content.id}" />
             </form>
             <div class="modal-footer">
               <a href="#" class="btn" data-dismiss="modal">Close</a>
