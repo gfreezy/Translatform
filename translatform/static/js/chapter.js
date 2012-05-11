@@ -109,14 +109,17 @@ $modal.on("click", "a.btn-primary", function() {
 $history.on("show", function(e) {
   var $source = $modal.data("source");
   var url = getTranslationURL($source);
+  var $ol = $("#history ol");
+  $ol.empty();
+  var $warn = $("#history .alert")
   $.getJSON(url+"history/", function(data) {
     if(data["translations"].length) {
-      var $history = $("#history");
-      $history.empty();
-      var $ol = $history.add("ol");
+      $warn.hide();
       $.each(data["translations"], function(index, value) {
         $ol.append("<li><pre>" + Encoder.htmlEncode(value) + "</pre></li>");
       });
+    } else {
+      $warn.show();
     }
   });
 });

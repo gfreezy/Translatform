@@ -73,6 +73,8 @@ ${content.body |n}
           <button class="close" data-dismiss="alert">×</button>
           <strong>Warning!</strong>这个段落目前为止还没有翻译！
         </div>
+        <ol>
+        </ol>
         <div class="modal-footer">
           <a href="#" class="btn" data-dismiss="modal">Close</a>
         </div>
