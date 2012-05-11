@@ -8,7 +8,6 @@
   <script src="/static/js/LAB.min.js"></script>
   <script>
     $LAB
-    .setGlobalDefaults({Debug:true})
     .script(["/static/js/encoder.js",
     "/static/js/jquery.min.js",
     "/static/js/md5-min.js"])
@@ -16,7 +15,8 @@
     .script(["/static/js/bootstrap.min.js",
     "/static/js/jquery.caret.js"])
     .wait()
-    .script("/static/js/chapter.js");
+    .script(["/static/js/chapter.js",
+    "/static/js/translated_chapter.js"]);
   </script>
   <title>
     ${content.title |n}
@@ -27,7 +27,7 @@
     <div class="navbar navbar-fixed-top">
       <div class="navbar-inner">
         <div class="container">
-          <a class="brand" href="#">
+          <a class="brand" href="/">
             Translatform
           </a>
           <ul class="nav">
@@ -35,7 +35,7 @@
               <a href="#">Translate</a>
             </li>
             <li>
-              <a href="#">Read</a>
+              <a href="#">English</a>
             </li>
           </ul>
           <ul class="nav pull-right">

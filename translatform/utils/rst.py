@@ -4,13 +4,17 @@ import hashlib
 import re
 
 def clean_format(rst):
-    txt = re.sub(r':.*?:`~(?:[a-zA-Z]+[.])+(.*?)`', r'\1', rst)
-    txt = re.sub(r':.*?:`(.*?)`', r'\1', txt)
-    txt = re.sub(r'`(.*?)`_', r'\1', txt)
-    txt = re.sub(r'`(.*?)`', r'\1', txt)
-    txt = re.sub(r'[*]{1,2}(.*?)[*]{1,2}', r'\1', txt)
-    txt = re.sub(r'[`]{1,2}(.*?)[`]{1,2}', r'\1', txt)
-    txt = txt.replace(r'::', ':')
+    txt = rst.replace(u'“', '"')
+    txt = txt.replace(u'”', '"')
+    txt = txt.replace(u'‘', '\'')
+    txt = txt.replace(u'’', '\'')
+    txt = re.sub(r'::$', ':', txt)
+    txt = re.sub(r':.+?:`[~](?:[a-zA-Z]+[.])*(.+?)`', r'\1', txt)
+    txt = re.sub(r':.+?:`(.+?)`', r'\1', txt)
+
+    txt = re.sub(r'[*]{1,2}(.+?)[*]{1,2}', r'\1', txt)
+    txt = re.sub(r'[`]{1,2}(.+?)[\s]?(?:<.+?>)?[`]{1,2}[_]?', r'\1', txt)
+
     return txt
 
 

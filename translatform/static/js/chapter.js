@@ -35,14 +35,32 @@ function htmlToText(html) {
    return tmp.textContent||tmp.innerText;
 }
 
-function getURL($target) {
-  var txt = tidy_text(htmlToText($target.html()));
-  console.info(txt);
+function getMD5(txt) {
   var md5 = hex_md5(txt);
+  return md5;
+}
+
+function getTranslationURL($target) {
+  var md5 = $target.attr("rel");
   var chap_id = $("input[name='chap_id']").val();
   return "/"+chap_id+"/"+md5+"/translation/";
 }
 
+function setTranslation($target, txt) {
+  if(txt) {
+    $target.html(Encoder.htmlEncode(txt));
+  }
+  $target.prepend("<i class='icon-edit'></i>");
+}
+
+// 为每段文字加上md5的rel
+$("p, li, dt, h1, h2, h3").each(function() {
+  var $this = $(this);
+  var txt = tidy_text(htmlToText($this.html()));
+//  console.info(txt);
+  var md5 = getMD5(txt);
+  $this.attr("rel", md5);
+});
 
 
 var $modal = $("#myModal");
@@ -51,20 +69,16 @@ var $translate = $("a[href='#translate']");
 
 $modal.modal({show:false});
 
-$(".content").on("click", "p, li, dt, h1, h2, h3", function() {
+$(".content").on("click", ".icon-edit", function() {
   var $source = $modal.data("source");
   if($source) {
     $source.removeClass("highlight");
   }
-  $source = $(this);
-  $source.toggleClass("highlight");
+  $source = $(this).parent();
+  $source.addClass("highlight");
   $modal.data("source", $source);
 
-  var url = $source.data("url");
-  if(!url) {
-    var url = getURL($(this));
-    $source.data("url", url);
-  }
+  var url = getTranslationURL($source);
   $trans = $modal.find("textarea.translation")
   $.getJSON(url, function(data) {
     $trans.val(Encoder.htmlDecode(data['translation']));
@@ -82,10 +96,10 @@ $(".content").on("click", "p, li, dt, h1, h2, h3", function() {
 
 $modal.on("click", "a.btn-primary", function() {
   var $source = $modal.data("source");
-  var url = $source.data("url");
+  var url = getTranslationURL($source);
   var text = $modal.find("textarea.translation").val();
   text = convertFromVisibleSpace(text);
-  $source.html(text);
+  setTranslation($source, text);
   $.post(url, {"translation": text}, function() {
     $modal.modal("hide");
   });
@@ -94,7 +108,7 @@ $modal.on("click", "a.btn-primary", function() {
 
 $history.on("show", function(e) {
   var $source = $modal.data("source");
-  var url = $source.data("url");
+  var url = getTranslationURL($source);
   $ol = $("#history ol");
   $ol.empty();
   $.getJSON(url+"history/", function(data) {
@@ -125,8 +139,4 @@ watchTextareaChange($("textarea.translation"), function($t) {
   var after = convertToVisibleSpace(before);
   $t.val(after);
   $t.caret(pos);
-});
-
-
-$(".content").on("click", "h1, h2, h3, p, li", function() {
 });

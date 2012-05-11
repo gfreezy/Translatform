@@ -12,6 +12,7 @@ def main(global_config, **settings):
     config.add_static_view('static', 'static', cache_max_age=3600)
     config.add_route('toc', '/')
     config.add_route('chapter', '/{chapter}/')
+    config.add_route('translated_chapter', '/{chapter}/translated/')
     config.add_route('translation',
                      '/{chapter}/{para_id}/translation/')
     config.add_route('translation_history',

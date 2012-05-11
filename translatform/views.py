@@ -18,14 +18,25 @@ def toc(request):
     toc = DBSession.query(Chapter).filter_by(name='index').first()
     return dict(content=toc)
 
+class ChapterView(object):
+    def __init__(self, request):
+        self.request = request
+        self.chap_name = request.matchdict.get('chapter')
+        self.chapter = DBSession.query(Chapter).filter_by(name=self.chap_name).first()
 
-@view_config(route_name='chapter', renderer='templates/chapter.mako')
-def chapter(request):
-    chap_name = request.matchdict.get('chapter')
-    chapter = DBSession.query(Chapter).filter_by(name=chap_name).first()
-    if not chapter:
-        raise HTTPNotFound('chapter %s not found' % chap_name)
-    return dict(content=chapter)
+    @view_config(route_name='chapter', renderer='templates/chapter.mako')
+    def normal_chapter(self):
+        if not self.chapter:
+            raise HTTPNotFound('chapter %s not found' % self.chap_name)
+        return dict(content=self.chapter)
+
+    @view_config(route_name='translated_chapter', renderer='json')
+    def translated_chapter(self):
+        if not self.chapter:
+            return dict(status='error', msg='chapter not found')
+        return dict(
+            status='ok',
+            paragraphs=dict([(para.identity, para.latest_translation()) for para in self.chapter.paragraphs]))
 
 
 class TranslationBase(object):
@@ -35,8 +46,6 @@ class TranslationBase(object):
         self.para_id = request.matchdict.get('para_id')
         self.para = DBSession.query(Paragraph).filter_by(
             chap_id=self.chap_id, identity=self.para_id).first()
-        if not self.para:
-            raise HTTPNotFound('Para. %s not exisits' % self.para_id)
 
 
 @view_defaults(route_name='translation')
@@ -44,12 +53,21 @@ class Translation(TranslationBase):
     @view_config(request_method='GET',
                  renderer='json')
     def get(self):
-        return dict(english=self.para.english,
+        if not self.para:
+            return dict(status='error',
+                        msg='Para. %s not exisits' % self.para_id)
+
+        return dict(status='ok',
+                    english=self.para.english,
                     translation=self.para.latest_translation())
 
     @view_config(request_method='POST',
                  renderer='json')
     def post(self):
+        if not self.para:
+            return dict(status='error',
+                        msg='Para. %s not exisits' % self.para_id)
+
         translation = self.request.params.get('translation')
         if not translation:
             return dict(status='error',
@@ -62,7 +80,8 @@ class AllTranslation(TranslationBase):
     @view_config(route_name='translation_history',
                  renderer='json')
     def get(self):
-        return dict(translations=self.para.all_translations())
+        return dict(status='ok',
+                    translations=self.para.all_translations())
 
 
 @view_config(route_name='comment',
