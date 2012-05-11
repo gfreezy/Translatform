@@ -30,10 +30,11 @@ form {
 .content {
     margin-top: 50px;
     text-align: left;
+    position: relative;
 }
 
 .icon-edit {
-    float: left;
-    margin-left: -20px;
+    position: absolute;
+    left: -25px;
     cursor: pointer;
 }

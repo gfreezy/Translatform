@@ -54,7 +54,7 @@ function setTranslation($target, txt) {
 }
 
 // 为每段文字加上md5的rel
-$("p, li, dt, h1, h2, h3").each(function() {
+$(".content, .nav .dropdown-menu").find("p, li, dt, h1, h2, h3").each(function() {
   var $this = $(this);
   var txt = tidy_text(htmlToText($this.html()));
 //  console.info(txt);
