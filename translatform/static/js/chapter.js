@@ -109,12 +109,15 @@ $modal.on("click", "a.btn-primary", function() {
 $history.on("show", function(e) {
   var $source = $modal.data("source");
   var url = getTranslationURL($source);
-  $ol = $("#history ol");
-  $ol.empty();
   $.getJSON(url+"history/", function(data) {
-    $.each(data["translations"], function(index, value) {
-      $ol.append("<li><pre>" + Encoder.htmlEncode(value) + "</pre></li>");
-    });
+    if(data["translations"].length) {
+      var $history = $("#history");
+      $history.empty();
+      var $ol = $history.add("ol");
+      $.each(data["translations"], function(index, value) {
+        $ol.append("<li><pre>" + Encoder.htmlEncode(value) + "</pre></li>");
+      });
+    }
   });
 });
 

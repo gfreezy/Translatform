@@ -19,6 +19,12 @@ ${next.body()}
 
 </div>
 
+<%block name="footer">
+<div class="footer">
+  footer
+</div>
+</%block>
+
 
 <%def name="def_navbar(active='', toc=None)">
 <div class="navbar navbar-fixed-top">

@@ -69,8 +69,10 @@ ${content.body |n}
         </div>
       </div>
       <div class="tab-pane" id="history">
-        <ol>
-        </ol>
+        <div class="alert">
+          <button class="close" data-dismiss="alert">×</button>
+          <strong>Warning!</strong>这个段落目前为止还没有翻译！
+        </div>
         <div class="modal-footer">
           <a href="#" class="btn" data-dismiss="modal">Close</a>
         </div>
