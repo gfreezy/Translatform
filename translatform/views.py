@@ -84,14 +84,39 @@ class AllTranslation(TranslationBase):
                     translations=self.para.all_translations())
 
 
-@view_config(route_name='comment',
-             request_method='POST')
-def new_comment(request):
-    pass
 
+class CommentView(object):
+    def __init__(self, request):
+        self.request = request
+        self.chap_id = request.matchdict.get('chapter')
+        self.para_id = request.matchdict.get('para_id')
+        self.para = DBSession.query(Paragraph).filter_by(
+            chap_id=self.chap_id, identity=self.para_id).first()
 
-@view_config(route_name='all_comment',
-             request_method='GET',
-             renderer='json')
-def all_comment(request):
-    pass
+    @view_config(route_name='comment',
+                 request_method='POST',
+                 renderer='json')
+    def new_comment(self):
+        if not self.para:
+            return dict(status='error',
+                        msg='Para. %s not exisits' % self.para_id)
+
+        comment = self.request.params.get('comment')
+        author = self.request.params.get('author')
+        if not comment or not author:
+            return dict(status='error',
+                        msg='no comment or no author')
+        self.para.add_comment(comment, author)
+        return dict(status='ok')
+
+    @view_config(route_name='all_comment',
+                 request_method='GET',
+                 renderer='json')
+    def all_comment(self):
+        if not self.para:
+            return dict(status='error',
+                        msg='chaper not found')
+
+        return dict(
+            status='ok',
+            comments=self.para.all_comments())

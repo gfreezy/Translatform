@@ -38,3 +38,9 @@ form {
     left: -25px;
     cursor: pointer;
 }
+
+.icon-comment {
+    position: absolute;
+    right: -20px;
+    cursor: pointer;
+}

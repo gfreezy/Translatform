@@ -25,8 +25,7 @@ ${parent.blk_js()}
   .script(["/static/js/bootstrap.min.js",
   "/static/js/jquery.caret.js"])
   .wait()
-  .script(["/static/js/chapter.js",
-  "/static/js/translated_chapter.js"]);
+  .script("/static/js/chapter.js");
 </script>
 </%block>
 
@@ -41,7 +40,7 @@ ${content.body |n}
 </%block>
 
 
-<div id="myModal" class="modal hide">
+<div id="translateModal" class="modal hide">
   <div class="modal-header">
     <div class="close" data-dismiss="modal">x</div>
     <ul class="nav nav-tabs">
@@ -72,6 +71,49 @@ ${content.body |n}
         <div class="alert">
           <button class="close" data-dismiss="alert">×</button>
           <strong>Warning!</strong>这个段落目前为止还没有翻译！
+        </div>
+        <ol>
+        </ol>
+        <div class="modal-footer">
+          <a href="#" class="btn" data-dismiss="modal">Close</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div id="commentModal" class="modal hide">
+  <div class="modal-header">
+    <div class="close" data-dismiss="modal">x</div>
+    <ul class="nav nav-tabs">
+      <li class="active">
+        <a href="#new-comment" data-toggle="tab">New Comment</a>
+      </li>
+      <li>
+        <a href="#all-comment" data-toggle="tab">All Comment</a>
+      </li>
+    </ul>
+  </div>
+  <div class="modal-body">
+    <div class="tab-content">
+      <div class="tab-pane active" id="new-comment">
+        <form class="span8">
+          <label>Comment</label>
+          <textarea class="span8" name="comment"></textarea>
+          <label>Name</label>
+          <input type="text" name="author" placeholder="Your name here" class="span4"/>
+          <input type="hidden" name="chap_id" value="${content.id}" />
+        </form>
+        <div class="modal-footer">
+          <a href="#" class="btn" data-dismiss="modal">Close</a>
+          <a href="#" class="btn btn-primary">Save</a>
+        </div>
+      </div>
+      <div class="tab-pane" id="all-comment">
+        <div class="alert">
+          <button class="close" data-dismiss="alert">×</button>
+          这个段落目前为止还没有评论！
         </div>
         <ol>
         </ol>

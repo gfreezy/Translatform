@@ -51,6 +51,15 @@ class Paragraph(Base):
         translations = DBSession.query(ParagraphTranslation).filter_by(para_id=self.id).order_by('id desc').all()
         return [t.translation for t in translations]
 
+    def add_comment(self, comment, author):
+        with transaction.manager:
+            c = ParagraphComment(author=author, comment=comment, para_id=self.id)
+            DBSession.add(c)
+
+    def all_comments(self):
+        comments = DBSession.query(ParagraphComment).filter_by(para_id=self.id).order_by('id desc').all()
+        return [(c.author, c.comment) for c in comments]
+
 
 class ParagraphTranslation(Base):
     __tablename__ = 'paragraph_translation'
