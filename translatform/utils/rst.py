@@ -63,5 +63,5 @@ def sphinx_build(target, builder='html', lang='en'):
         shutil.copy(src, dest)
 
         mkdirs(path)
-        cmd = ['sphinx-build', '-b', builder, DOC_PATH, path]
+        cmd = ['sphinx-build', '-Q', '-b', builder, DOC_PATH, path]
         subprocess.call(cmd)
