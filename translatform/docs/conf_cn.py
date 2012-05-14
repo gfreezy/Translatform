@@ -194,6 +194,5 @@ latex_additional_files = ['werkzeugstyle.sty', 'logo.pdf']
 latex_use_modindex = False
 
 
-
 locale_dirs = ['translated/']
 language = 'cn'

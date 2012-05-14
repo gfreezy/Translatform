@@ -1,5 +1,10 @@
 <%inherit file="base.mako" />
 
+<%block name="blk_css">
+<link rel="stylesheet" href="/static/css/bootstrap.min.css" />
+<link rel="stylesheet" href="/static/css/site.css" />
+</%block>
+
 <%block name="blk_js">
 <script src="/static/js/LAB.min.js"></script>
 </%block>
@@ -21,7 +26,9 @@ ${next.body()}
 
 <%block name="footer">
 <div class="footer">
-  footer
+  <div class="container">
+  By gfreezy <a href="mailto:gfreezy+translatform@gmail.com">gfreezy+translatform@gmail.com</a>
+  </div>
 </div>
 </%block>
 
@@ -33,24 +40,11 @@ ${next.body()}
       <a class="brand" href="/">
         Translatform
       </a>
-      <ul class="nav">
-        <li ${'class=active' if active=='translate' else ''}>
-          <a href="#">Translate</a>
-        </li>
-        <li ${'class=active' if active=='english' else ''}>
-          <a href="/docs/html_en/index.html" target="_blank">English</a>
-        </li>
-        <li ${'class=active' if active=='english' else ''}>
-          <a href="/docs/html_cn/index.html" target="_blank">Chinese</a>
-        </li>
-      </ul>
+
       <ul class="nav pull-right">
-        <li>
-          <a href="${request.route_url('toc')}">Content</a>
-        </li>
         %if toc:
-        <li class="dropdown">
-          <a href="#"
+        <li class="dropdown" id="dropdown-toc">
+          <a href="#dropdown-toc"
              class="dropdown-toggle"
              data-toggle="dropdown">
             目录
@@ -61,6 +55,25 @@ ${next.body()}
           </ul>
         </li>
         %endif
+        <li class="dropdown" id="dropdown-read">
+          <a href="#dropdown-read"
+             class="dropdown-toggle"
+             data-toggle="dropdown">
+            阅读
+            <b class="caret"></b>
+          </a>
+          <ul class="dropdown-menu">
+            <li>
+              <a href="/docs/html_en/index.html" target="_blank">原文</a>
+            </li>
+            <li>
+              <a href="/docs/html_cn/index.html" target="_blank">翻译</a>
+            </li>
+            <li>
+              <a href="/regenerate/" target="_blank">重新生成文档</a>
+            </li>
+          </ul>
+        </li>
       </ul>
     </div>
   </div>

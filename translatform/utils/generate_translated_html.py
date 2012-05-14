@@ -13,7 +13,7 @@ from pyramid.paster import get_appsettings
 from ..models.init import DBSession
 from ..models.paragraph import Paragraph
 from ..conf import DOC_PATH
-from .rst import (clean_format, md5, clean_space)
+from .rst import (clean_format, md5, clean_space, sphinx_build, mkdirs)
 
 
 def usage(argv):
@@ -21,12 +21,6 @@ def usage(argv):
     print('usage: %s <config_uri>\n'
           '(example: "%s development.ini")' % (cmd, cmd))
     sys.exit(1)
-
-
-def mkdirs(path):
-    if os.path.exists(path):
-        shutil.rmtree(path)
-    os.makedirs(path)
 
 
 def get_identity(line):
@@ -84,15 +78,11 @@ def convert_to_mo(path=DOC_PATH):
         subprocess.call(cmd)
 
 
-def sphinx_build(lang='cn'):
-    src = os.path.join(DOC_PATH, 'conf_%s.py' % lang)
-    dest = os.path.join(DOC_PATH, 'conf.py')
-    shutil.copy(src, dest)
-    path = os.path.join(DOC_PATH, 'html_'+lang)
-    if os.path.exists(path):
-        shutil.rmtree(path)
-    cmd = ['sphinx-build', DOC_PATH, path]
-    subprocess.call(cmd)
+def generate():
+    translate_to_po()
+    convert_to_mo()
+    sphinx_build('html_cn', lang='cn')
+    sphinx_build('html_en', lang='en')
 
 
 def main(argv=sys.argv):
@@ -104,10 +94,7 @@ def main(argv=sys.argv):
     engine = engine_from_config(settings, 'sqlalchemy.')
     DBSession.configure(bind=engine)
 
-    translate_to_po()
-    convert_to_mo()
-    sphinx_build('cn')
-    sphinx_build('en')
+    generate()
 
 
 if __name__ == '__main__':

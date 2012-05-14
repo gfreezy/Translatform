@@ -9,10 +9,11 @@ def main(global_config, **settings):
     engine = engine_from_config(settings, 'sqlalchemy.')
     DBSession.configure(bind=engine)
     config = Configurator(settings=settings)
-    config.add_static_view('static', 'static', cache_max_age=3600)
-    config.add_static_view('docs', 'docs', cache_max_age=3600)
+    config.add_static_view('static', 'static')
+    config.add_static_view('docs', 'docs')
 
-    config.add_route('toc', '/')
+    config.add_route('regenerate', '/regenerate/')
+    config.add_route('index', '/')
     config.add_route('chapter', '/{chapter}/')
     config.add_route('translated_chapter', '/{chapter}/translated/')
     config.add_route('translation',

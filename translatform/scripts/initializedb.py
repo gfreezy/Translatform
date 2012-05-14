@@ -22,8 +22,8 @@ from ..models.paragraph import (
     ParagraphTranslation,
     ParagraphComment,
     )
-from ..utils.rst import clean_format
 from ..conf import DOC_PATH
+from ..utils.rst import sphinx_build
 
 
 def usage(argv):
@@ -90,6 +90,8 @@ def main(argv=sys.argv):
     Base.metadata.drop_all(engine)
     Base.metadata.create_all(engine)
 
+    sphinx_build('json', builder='json')
+    sphinx_build('pot', builder='gettext')
     insert_chapters()
 
     with transaction.manager:

@@ -1,6 +1,7 @@
 from pyramid.view import (
     view_config,
     view_defaults,
+    notfound_view_config,
     )
 from pyramid.httpexceptions import HTTPNotFound
 
@@ -12,11 +13,36 @@ from .models.paragraph import (
     ParagraphComment,
     )
 
+from .utils.generate_translated_html import generate
 
-@view_config(route_name='toc', renderer='templates/toc.mako')
-def toc(request):
-    toc = DBSession.query(Chapter).filter_by(name='index').first()
-    return dict(content=toc)
+
+@notfound_view_config(append_slash=True)
+def notfound(request):
+    return HTTPNotFound('Not found, bro.')
+
+
+@view_config(route_name='index', renderer='templates/index.mako')
+def index(request):
+    return dict()
+
+
+@view_defaults(route_name='regenerate')
+class Regenerate(object):
+    def __init__(self, request):
+        self.request = request
+
+    @view_config(request_method='GET', renderer='templates/regenerate.mako')
+    def get(self):
+        return dict()
+
+    @view_config(request_method='POST', renderer='json')
+    def post(self):
+        action = self.request.params.get('action')
+        if action == 'regenerate':
+            generate()
+            return dict(status='ok')
+        return dict(status='error')
+
 
 class ChapterView(object):
     def __init__(self, request):

@@ -2,35 +2,33 @@
     width: 700px;
     margin-left: -350px;
 }
+
 .modal-header {
     padding: 5px 15px;
     border-bottom: 0;
 }
-.nav.nav-tabs {
-    margin-bottom: 0px;
-}
+
 .modal-body {
     padding: 0 15px 5px;
 }
+
 .modal-footer {
     padding: 4px 15px 5px;
 }
+
 textarea {
     height: 130px;
     font-size: 14px;
     white-space: pre;
     font-family: monospace;
 }
+
 form {
     margin-bottom: 0;
 }
+
 .highlight {
-    background-color: blue;
-}
-.content {
-    margin-top: 50px;
-    text-align: left;
-    position: relative;
+    background-color: #E3EFF1;
 }
 
 .icon-edit {

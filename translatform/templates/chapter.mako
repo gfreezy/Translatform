@@ -6,7 +6,7 @@ ${content.title |n}
 
 
 <%block name="blk_css">
-<link rel="stylesheet" href="/static/css/bootstrap.min.css" />
+${parent.blk_css()}
 <link rel="stylesheet" href="/static/css/sphinx/pygments.css" />
 <link rel="stylesheet" href="/static/css/sphinx/style.css" />
 <link rel="stylesheet" href="/static/css/chapter.css" />
