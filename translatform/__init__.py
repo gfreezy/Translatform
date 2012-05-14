@@ -10,6 +10,8 @@ def main(global_config, **settings):
     DBSession.configure(bind=engine)
     config = Configurator(settings=settings)
     config.add_static_view('static', 'static', cache_max_age=3600)
+    config.add_static_view('docs', 'docs', cache_max_age=3600)
+
     config.add_route('toc', '/')
     config.add_route('chapter', '/{chapter}/')
     config.add_route('translated_chapter', '/{chapter}/translated/')

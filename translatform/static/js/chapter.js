@@ -111,10 +111,10 @@ $history.on("show", function(e) {
   var url = getTranslationURL($source);
   var $ol = $("#history ol");
   $ol.empty();
-  var $warn = $("#history .alert")
+  var $warn = $("#history .alert");
+  $warn.hide();
   $.getJSON(url+"history/", function(data) {
     if(data["translations"].length) {
-      $warn.hide();
       $.each(data["translations"], function(index, value) {
         $ol.append("<li><pre>" + Encoder.htmlEncode(value) + "</pre></li>");
       });

@@ -7,7 +7,6 @@ import simplejson
 import codecs
 
 from sqlalchemy import engine_from_config
-
 from pyramid.paster import (
     get_appsettings,
     setup_logging,
@@ -24,8 +23,7 @@ from ..models.paragraph import (
     ParagraphComment,
     )
 from ..utils.rst import clean_format
-
-PATH = '/home/gfreezy/src/werkzeug/docs/'
+from ..conf import DOC_PATH
 
 
 def usage(argv):
@@ -36,7 +34,7 @@ def usage(argv):
 
 
 def insert_chapters():
-    path = os.path.join(PATH, 'json')
+    path = os.path.join(DOC_PATH, 'json')
     pattern = os.path.join(path, '*.fjson')
     for p in glob.glob(pattern):
         with codecs.open(p, encoding='utf8') as f:
@@ -59,7 +57,7 @@ def insert_chapters():
 
 
 def insert_paragraphs(chapter):
-    path = os.path.join(PATH, 'po')
+    path = os.path.join(DOC_PATH, 'pot')
     filename = '.'.join((os.path.splitext(chapter.sourcename)[0], 'pot'))
     fullname = os.path.join(path, filename)
     for para_txt in get_paragraphs(fullname):

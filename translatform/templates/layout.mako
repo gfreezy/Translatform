@@ -38,7 +38,10 @@ ${next.body()}
           <a href="#">Translate</a>
         </li>
         <li ${'class=active' if active=='english' else ''}>
-          <a href="#">English</a>
+          <a href="/docs/html_en/index.html" target="_blank">English</a>
+        </li>
+        <li ${'class=active' if active=='english' else ''}>
+          <a href="/docs/html_cn/index.html" target="_blank">Chinese</a>
         </li>
       </ul>
       <ul class="nav pull-right">
