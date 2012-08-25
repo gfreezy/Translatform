@@ -15,6 +15,7 @@ requires = [
     'zope.sqlalchemy',
     'waitress',
     'simplejson',
+    'Sphinx',
     ]
 
 setup(name='translatform',
