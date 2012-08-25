@@ -1,2 +1,9 @@
 *.pyc
 translatform.egg-info/
+bin/
+build/
+dist/
+include/
+lib/
+translatform.db
+.Python
